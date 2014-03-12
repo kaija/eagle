@@ -24,9 +24,24 @@
 static struct event_base *evbase_accept;
 static workqueue_t workqueue;
 
+static unsigned long pkt_counter;
+
 /* Signal handler function (defined below). */
 static void sighandler(int signal);
 
+static struct timeval bench_tv1, bench_tv2;
+static unsigned long long start_utime, end_utime;
+void bench_start()
+{
+	gettimeofday(&bench_tv1,NULL);
+}
+unsigned long long bench_stop()
+{
+	gettimeofday(&bench_tv2,NULL);
+    start_utime = bench_tv1.tv_sec * 1000000 + bench_tv1.tv_usec;
+    end_utime = bench_tv2.tv_sec * 1000000 + bench_tv2.tv_usec;
+	return end_utime - start_utime;
+}
 /**
  * Set a socket to non-blocking mode.
  */
@@ -87,14 +102,15 @@ void buffered_on_read(struct bufferevent *bev, void *arg) {
 		/* Add the chunk of data from our local array (data) to the client's output buffer. */
 		evbuffer_add(client->output_buffer, data, nbytes);
 	}
-
-printf("READ\n%s\n", data);
+	pkt_counter++;
+	if(pkt_counter % 100 == 0) printf("%lu\n", pkt_counter);
 	/* Send the results to the client.  This actually only queues the results for sending.
-	 * Sending will occur asynchronously, handled by libevent. */
+	 * Sending will occur asynchronously, handled by libevent. 
 	if (bufferevent_write_buffer(bev, client->output_buffer)) {
 		errorOut("Error sending data to client on fd %d\n", client->fd);
 		closeClient(client);
 	}
+	*/
 }
 
 /**
@@ -113,11 +129,9 @@ void buffered_on_error(struct bufferevent *bev, short what, void *arg) {
 }
 
 static void server_job_function(struct job *job) {
-printf("%s:%d\n", __func__,__LINE__);
 	client_t *client = (client_t *)job->user_data;
-
 	event_base_dispatch(client->evbase);
-	closeAndFreeClient(client);
+	//closeAndFreeClient(client);
 	free(job);
 }
 
@@ -126,7 +140,7 @@ printf("%s:%d\n", __func__,__LINE__);
  * ready to be accepted.
  */
 void on_accept(int fd, short ev, void *arg) {
-printf("%s:%d\n", __func__,__LINE__);
+	printf("accept new socket %d\n", fd);
 	int client_fd;
 	struct sockaddr_in client_addr;
 	socklen_t client_len = sizeof(client_addr);
@@ -324,5 +338,6 @@ static void sighandler(int signal) {
  * You can remove this and simply call runServer() from your application. */
 int main(int argc, char *argv[]) {
     printf("Eagle Media Server %s\n", VERSION);
+    printf("Binding on %s:%d\n", "127.0.0.1", SERVER_PORT);
 	return runServer();
 }

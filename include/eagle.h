@@ -4,14 +4,14 @@
 
 #define VERSION "0.1"
 /* Port to listen on. */
-#define SERVER_PORT 554
+#define SERVER_PORT 8554
 /* Connection backlog (# of backlogged connections to accept). */
 #define CONNECTION_BACKLOG 8
 /* Socket read and write timeouts, in seconds. */
 #define SOCKET_READ_TIMEOUT_SECONDS 10
 #define SOCKET_WRITE_TIMEOUT_SECONDS 10
 /* Number of worker threads.  Should match number of CPU cores reported in /proc/cpuinfo. */
-#define NUM_THREADS 8
+#define NUM_THREADS 2
 
 /* Behaves similarly to fprintf(stderr, ...), but adds file, line, and function
  information. */
