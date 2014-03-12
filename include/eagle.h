@@ -2,7 +2,9 @@
 #define __EAGLE_H
 #include <event.h>
 
+#ifndef VERSION
 #define VERSION "0.1"
+#endif
 /* Port to listen on. */
 #define SERVER_PORT 8554
 /* Connection backlog (# of backlogged connections to accept). */

@@ -1,4 +1,4 @@
-CFLAGS+= -I../
+CFLAGS+= -I../include
 all: tcp
 
 tcp: tcp.o ../utils.o ../libs/parson.o
