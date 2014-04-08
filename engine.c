@@ -3,7 +3,8 @@
 #include <string.h>
 #include <uv.h>
 
-#include <utils.h>
+#include "utils.h"
+#include "rtsp.h"
 
 static const int PORT = 8080;
 static const int DEBUG = 1;
@@ -14,10 +15,10 @@ typedef struct {
 } write_req_t;
 
 static uv_loop_t *loop;
-static uv_loop_t *client_loop;
-static uv_handle_t* server;
-static uv_tcp_t tcpServer; // tcp network io
-static int server_closed;
+//static uv_loop_t *client_loop;
+//static uv_handle_t* server;
+//static uv_tcp_t tcpServer; // tcp network io
+//static int server_closed;
 uv_tcp_t * client_handle;
 
 static void on_connection(uv_stream_t*, int status);
@@ -98,13 +99,13 @@ static void after_shutdown(uv_shutdown_t* req, int status) {
     free(req);
 
 }
-
+#if 0
 static void on_server_close(uv_handle_t* handle) {
     if (DEBUG) {
         fprintf(stdout, "Debug: on_server_close: %d\n", 0);
     }
 }
-
+#endif
 static void after_write(uv_write_t* req, int status) {
 /*
     write_req_t* wr;
@@ -165,6 +166,9 @@ static void after_read(uv_stream_t* handle,
 }
 
 int main() {
+
+    rtsp_get_time();
+
     struct sockaddr_in addr;
     uv_ip4_addr("0.0.0.0", PORT, &addr);
     loop = uv_default_loop();
